@@ -1,5 +1,2 @@
-cd python37
-cd Scripts
-set FLASK_APP=app.py
-set FLASK_DEBUG=1
-flask.exe run
+cd Project
+python.exe project\app.py
