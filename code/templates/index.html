@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>爬取雷达降水瓦片图</title>
+
+    <!-- Leaflet -->
+    <link href="/js/leaflet/leaflet.css" type="text/css" rel="stylesheet"/>
+    <script src="/js/leaflet/leaflet.js"></script>
+    <script src="/js/leaflet/plugins/leaflet.ChineseTmsProviders.js"></script>
+
+	<!-- boostrap -->
+    <link href="/js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery-3.3.1.js"></script>
+    <script src="/js/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <!-- 时间插件 -->
+    <link href="/js/bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <script src="/js/bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="/js/bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.zh-CN.js"></script>
+
+    <script type="text/javascript" src="/js/index.js"></script>
+
+   	<style type="text/css">
+   		#map{  height:100% ; width:100%; position:absolute;}
+		body{  margin:0px; padding:0px; overflow:hidden;}
+		#formDiv{
+			width:400px;
+			height:500px;
+			top:25px;
+			right:25px;
+			position:absolute;
+			z-index: 9999;
+			background-color:#FFFFFF;
+		}
+		#leftTitleContext{text-align:center;}
+		#errorInfo{text-align:center; color:red;}
+   	</style>
+
+
+</head>
+<body>
+	<div id="map">
+	</div>
+	<div id="formDiv">
+		<div id="leftTitle">
+			<h3 id="leftTitleContext">设&nbsp;&nbsp;&nbsp;置</h3>
+		</div>
+
+		<form id='formid' action="{{ url_for('initparam') }}" method="post">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">开始时间</label>
+				<div class="col-sm-8 input-append date form_datetime">
+				    <input id="startTime" name="startTime" class="form-control" type="text" value="" readonly placeholder="还未选择时间。">
+				    <span class="add-on"><i class="icon-remove"></i></span>
+				    <span class="add-on"><i class="icon-calendar"></i></span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">结束时间</label>
+				<div class="col-sm-8 input-append date form_datetime">
+				    <input id="endTime" name="endTime" class="form-control" type="text" value="" readonly placeholder="可选项（默认不自动停止）">
+				    <span class="add-on"><i class="icon-remove"></i></span>
+				    <span class="add-on"><i class="icon-calendar"></i></span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">时间间隔(min)</label>
+				<div class="col-sm-8">
+					<input id="interval" name="interval" type="number" class="form-control"  value="30">
+				</div>
+			</div>
+
+            <div class="form-group">
+				<label class="col-sm-4 control-label">爬取的步长(°)</label>
+				<div class="col-sm-8">
+					<input id="step" name="step" type="number" class="form-control"  value="2">
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label class="col-sm-4 control-label">爬取范围</label>
+				<div class="col-sm-8">
+					<button id="rectangleSel" type="button" class="btn btn-default">选取范围</button>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label class="col-sm-4 control-label">中心点坐标</label>
+				<div class="col-sm-8">
+					<input id="centerPoint" name="centerPoint" class="form-control loc" type="text" placeholder="还未选择范围。" readOnly="true">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">左上角坐标</label>
+				<div class="col-sm-8">
+					<input id="northWestPoint" name="northWestPoint" class="form-control loc" type="text" placeholder="还未选择范围。" readOnly="true">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">右上角坐标</label>
+				<div class="col-sm-8">
+					<input id="northEastPoint" name="northEastPoint" class="form-control loc"  type="text" placeholder="还未选择范围。" readOnly="true">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">右下角坐标</label>
+				<div class="col-sm-8">
+					<input id="southEastPoint" name="southEastPoint" class="form-control loc" type="text" placeholder="还未选择范围。" readOnly="true">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">左下角坐标</label>
+				<div class="col-sm-8">
+					<input id="southWestPoint" name="southWestPoint" class="form-control loc"  type="text" placeholder="还未选择范围。" readOnly="true">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">保存文件夹</label>
+				<div class="col-sm-8">
+					<input id="saveFileDir" name="saveFileDir" type="text"/>
+				</div>
+			</div>
+
+            <div class="form-group">
+				<label class="col-sm-4 control-label">项目备注</label>
+				<div class="col-sm-8">
+					<input id="remark" name="remark" type="text"/>
+				</div>
+			</div>
+
+			<div id="errorInfo">
+				【提醒】 爬取范围、保存文件夹为必选项。
+			</div>
+			<button type="submit" class="btn btn-default" style="width:100%">提交</button>
+		</form>
+	</div>
+</body>
+
+</html>
