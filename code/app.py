@@ -10,11 +10,12 @@
 # flask
 from flask import Flask, render_template, request, jsonify
 import webbrowser
+from concurrent.futures import ThreadPoolExecutor
+
 
 # data structure
 from collections import OrderedDict
 from crawler import get_frames
-
 
 # Tools
 import os
@@ -25,10 +26,10 @@ from json import loads
 
 import log
 
-
 app = Flask(__name__,
     static_url_path='' #将static路径该为/，文件正常引用
 )
+executor = ThreadPoolExecutor(1)
 global params
 
 @app.route('/')
@@ -65,12 +66,43 @@ def getframesinfo():
 
 @app.route('/dowork', methods=['post'])
 def dowork():
-    print("【前端返回】{}".format(request.values) )
+    global params
+
+    # 图幅处理
+    log.getlogger().info( "【前端返回】{}".format(request.values) )
     selected_frames_str = request.form.get("selected_frames", type=str)
     frames_selected = loads(selected_frames_str)
-    print("【选择的图幅号】{}".format(frames_selected) )
-    return "正在爬取。"
+    params["frames_selected"] = frames_selected
+    log.getlogger().info("【选择的图幅号】{}".format(frames_selected))
+    for frame in params["frames"]:
+        if frame in frames_selected:
+            params["frames"][frame]["selected"] = "1"
+        else:
+            params["frames"][frame]["selected"] = "0"
 
+    print("[DEBUG]{}".format(params))
+    # 初始化文件夹
+    init_dir()
+    ret = save_params_file(params) #将参数保存至文件夹
+    ret = ret.split("\n")
+
+    return render_template('start.html', infos=ret)
+
+from worker import start_work
+@app.route('/start', methods=['post'])
+def start():
+    global params
+    # 开启任务，异步进程
+    executor.submit(
+        start_work(params)
+    )
+    return "ok"
+
+from worker import stop_work
+@app.route('/stop', methods=['post'])
+def stop():
+    stop_work()
+    return "ok"
 
 def processing_params(request):
     """
@@ -145,6 +177,80 @@ def redirect_index(msg):
         </body>
         </html>
     ''' % msg
+
+def init_dir():
+    global params
+    project_dir = params["project_dir"]
+
+    # original文件夹
+    original_dir = os.path.join(project_dir, "0original")
+    if os.path.exists(original_dir) is False:
+        os.mkdir(original_dir)
+    params["original_dir"] = original_dir
+
+    # registration文件夹
+    registration_dir = os.path.join(project_dir, "1registration")
+    if os.path.exists(registration_dir) is False:
+        os.mkdir(registration_dir)
+    params["registration_dir"] = registration_dir
+
+    # mosaic
+    mosaic_dir = os.path.join(project_dir, "2mosaic")
+    if os.path.exists(mosaic_dir) is False:
+        os.mkdir(mosaic_dir)
+    params["mosaic_dir"] = mosaic_dir
+
+    # frame文件夹
+    for frame_num in params["frames_selected"]:
+        # 原始数据
+        frame_dir = os.path.join(original_dir, frame_num)
+        if os.path.exists(frame_dir) is False:
+            os.mkdir(frame_dir)
+        # 配准数据
+        frame_dir = os.path.join(registration_dir, frame_num)
+        if os.path.exists(frame_dir) is False:
+            os.mkdir(frame_dir)
+
+    return True
+
+def save_params_file(params):
+    """ 将参数输出
+    :param params:
+    :return:
+    """
+    import os
+    params_name = {
+        "create_time" : "工程创建时间",
+        "start_time": "爬取的开始时间",
+        "end_time": '爬取的结束时间',
+        "interval": '爬取的时间间隔（min）',
+        "step" : "爬取的步长（°）",
+        "points": '用户框选范围',
+        'save_file_dir': '保存文件夹',
+        "remark": "项目备注",
+        "frames_selected" : "选择的图幅号",
+        'project_dir' : '工程目录（图像输出文件夹）',
+        "log_dir" : "日志文件夹",
+        "original_dir" : "原始数据-GCJ02",
+        "registration_dir" : "配准数据-WGS84",
+        "mosaic_dir" : "镶嵌图-WGS84"
+    }
+    out_path = os.path.join(
+        params["project_dir"], u'爬取参数.txt'
+    )
+    ret = "无特殊说明，坐标都为GCJ-02标准\n"
+    with open(out_path, 'w+', encoding='utf-8') as fp:
+        for param in params.keys():
+            if param in params_name.keys():
+                name = params_name[param]
+                value = params[param]
+                ret += '【' + str(name) + '】\t' + str(value) + '\n'
+        fp.write(ret)
+        fp.close()
+    if ret=="":
+        return "【ERROR】 保存初始参数时，出错"
+    else:
+        return ret
 
 if __name__ == '__main__':
     webbrowser.open("http:\\127.0.0.1:5000")

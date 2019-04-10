@@ -28,7 +28,6 @@ def wgs84togcj02(lng, lat):
     mglng = lng + dlng
     return [mglng, mglat]
 
-
 def gcj02towgs84(lng, lat):
     """
     GCJ02(火星坐标系)转GPS84

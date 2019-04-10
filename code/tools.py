@@ -68,3 +68,23 @@ def parse_latlngstr(latlng_str):
     latlng = result.group(1)
     lat,lng = latlng.split(',')
     return float(lat),float(lng)
+
+def is_timestr(str):
+    """ 检查是否为时间字符串
+    :param str:
+    :return:
+    """
+    import re
+    result = re.match(RE_TIME_FORMAT, str)
+    if result is None:
+        return False
+    else:
+        return True
+
+
+def floatrange(start, stop, step):
+    l = []
+    while start<stop:
+        l.append(start)
+        start+=step
+    return l
