@@ -1,0 +1,39 @@
+{
+    "create_time": "2019-04-10 15-37-41",
+    "start_time": "2019-04-10 14-00",
+    "end_time": "\u672a\u8bbe\u7f6e",
+    "interval": 30,
+    "step": 2,
+    "points": {
+        "center_point": [
+            25.958045,
+            118.125
+        ],
+        "north_west_point": [
+            28.380383,
+            115.453126
+        ],
+        "north_east_point": [
+            28.380383,
+            120.814454
+        ],
+        "south_east_point": [
+            23.484759,
+            120.814454
+        ],
+        "south_west_point": [
+            23.484759,
+            115.453126
+        ]
+    },
+    "save_file_dir": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp",
+    "remark": "\u798f\u5efa\u7701\u96f7\u8fbe\u964d\u6c34\u56fe",
+    "extent_gcj02": [
+        23.484759,
+        115.453126,
+        28.380383,
+        120.814454
+    ],
+    "project_dir": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp\\2019-04-10 15-37-41",
+    "log_dir": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp\\2019-04-10 15-37-41\\log"
+}

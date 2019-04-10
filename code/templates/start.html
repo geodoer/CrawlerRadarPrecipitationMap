@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>开始爬取</title>
+
+    <!-- boostrap -->
+    <link href="/js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/jquery-3.3.1.js"></script>
+    <script src="/js/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        #errorInfo{
+            text-align:center;
+            color:red;
+            font-size:14px;
+        }
+        #info{
+            font-size:20px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <di id="info">
+        {% for info in infos %}
+            {{ info }}<br/>
+        {% endfor %}
+    </di>
+    <button id="confirm" type="submit" class="btn btn-default" style="width:100%">开始爬取</button>
+    <button id="stop" type="submit" class="btn btn-default" style="width:100%">停止爬取</button>
+    <div id="errorInfo"></div>
+</body>
+
+</html>

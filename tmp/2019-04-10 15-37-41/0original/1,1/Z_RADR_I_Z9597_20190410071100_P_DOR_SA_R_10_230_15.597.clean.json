@@ -1,0 +1,17 @@
+{
+    "timestamp": 1554880260.0,
+    "time": "2019-04-10 15-11-00",
+    "url": "http://cdn.caiyunapp.com/res/storm_radar/radar_NMIC_AZ9597_nmc_fast/20190410/Z_RADR_I_Z9597_20190410071100_P_DOR_SA_R_10_230_15.597.clean.png",
+    "extent_gcj02": [
+        22.998490586275732,
+        114.90579501849301,
+        27.13074261372427,
+        119.467632581507
+    ],
+    "req_pnt": [
+        25,
+        117
+    ],
+    "file_path": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp\\2019-04-10 15-37-41\\0original\\1,1\\Z_RADR_I_Z9597_20190410071100_P_DOR_SA_R_10_230_15.597.clean.png",
+    "file_name": "Z_RADR_I_Z9597_20190410071100_P_DOR_SA_R_10_230_15.597.clean.png"
+}

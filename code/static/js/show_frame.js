@@ -179,15 +179,40 @@ function dowork() { //提交选择的图幅
         $("#errorInfo").html("还未选择图幅");
         return ;
     }
+    $("#errorInfo").html("正在爬取，可关闭此网页。");
     $.ajax({
         type : "post",
-        async : false,
+        async : true,
         url : "/dowork",
         data : {
             "selected_frames" : JSON.stringify(selected_frames)
         },
         success: function (result) {
-            $("#errorInfo").html(result);
+            console.log(result);
+            $('html').html(result);
+            $("#stop").click(function () {
+                $.ajax({
+                    type : "post",
+                    async : true,
+                    url : "/stop",
+                    data : {},
+                    success: function (result) {
+                        $("#errorInfo").html(result);
+                    }
+                })
+            });
+            $("#confirm").click(function () {
+                $.ajax({
+                    type : "post",
+                    async : true,
+                    url : "/start",
+                    data : {},
+                    success: function (result) {
+                        $("#errorInfo").html(result);
+                    }
+                });
+                $("#errorInfo").html("正在爬取，可关闭此网页。");
+            });
         }
     });
 }

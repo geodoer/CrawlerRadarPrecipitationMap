@@ -12,6 +12,7 @@ import requests
 import json
 from collections import OrderedDict
 import log
+import os
 
 home = "https://api.caiyunapp.com/v1/radar/images"
 headers = {
@@ -136,3 +137,12 @@ def get_frames(params):
 
     log.save_json("frams", frames)
     return frame_len,frames
+
+def download_file(url, out_dir):
+    fn = url.split('/')[-1]
+    fc = requests.get(url).content
+    fp = os.path.join(out_dir, fn)
+    with open(fp, "wb") as f:
+        f.write(fc)
+        return fn, fp
+    return None,None
