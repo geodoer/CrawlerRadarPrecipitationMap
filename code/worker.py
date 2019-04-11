@@ -113,7 +113,7 @@ def start_work(_params):
     save_to_shp()
 
     # 结束时间
-    end_time = params["end_time"]
+    end_time = "{}-00".format( params["end_time"] )
     if is_timestr(end_time):
         # 设置了结束时间
         end_timestrap = time_to_timestamp(end_time)  # 转换为时间戳好比较时间
