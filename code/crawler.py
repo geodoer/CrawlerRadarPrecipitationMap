@@ -14,6 +14,8 @@ from collections import OrderedDict
 import log
 import os
 
+# ===============================================================
+#           爬取参数设置
 home = "https://api.caiyunapp.com/v1/radar/images"
 headers = {
     "User-Agent" : "Dalvik/2.1.0 (Linux; U; Android 8.1.0; MI 5X MIUI/V10.2.3.0.ODBCNXM)",
@@ -29,8 +31,10 @@ params = {
     "device_id" : "99001113012363"
 }
 
+# ============================================================
+#           网络模块
 def do_get(lat, lon):
-    """ 请求
+    """ 雷达降水图接口
     :param lat: 纬度
     :param lon: 经度
     :return:
@@ -63,6 +67,10 @@ def do_get(lat, lon):
             return imgs
 
 def get_frames(params):
+    """ 得到区域内的图幅
+    :param params:
+    :return:
+    """
     frames = OrderedDict()
     step = params["step"] # 设置步长
 
@@ -139,6 +147,11 @@ def get_frames(params):
     return frame_len,frames
 
 def download_file(url, out_dir):
+    """ 下载模块
+    :param url:
+    :param out_dir:
+    :return:
+    """
     fn = url.split('/')[-1]
     fc = requests.get(url).content
     fp = os.path.join(out_dir, fn)

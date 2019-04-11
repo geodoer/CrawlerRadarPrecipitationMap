@@ -30,7 +30,7 @@ from gdal_merge import main_by_params
 
 
 # =================================================
-# 定时任务
+#           定时任务
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 sched = BlockingScheduler()
@@ -42,7 +42,8 @@ def listener(event):
         log.getlogger().info( "【爬取任务正常运行】")
 sched.add_listener(listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
-
+# ================================================================
+#           数据结构
 global params
 global original_data
 original_data = OrderedDict()
@@ -75,25 +76,28 @@ registration_data = OrderedDict()
     # }
 global mosaic_data
 mosaic_data = OrderedDict()
-# {
-#     "2019-04-09 19-00-00": { #时间线上的时间戳
-#         "time": "none", #融合后的名字
-#         "file_path": "none", #融合后的路径
-#         "subimgs": { #子图
-#             "2019-04-09 18-58-00": { #时间
-#                 "extent": [ #范围WGS84
-#                     23.001399080910634,
-#                     114.90128470887859,
-#                     27.133925327023302,
-#                     119.46273202573005
-#                 ],
-#                 "file_path": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp\\2019-04-09 20-39-47\\1registration\\1,1\\1,1 2019-04-09 18-58-00.tif",
-#                 "frame_num": "1,1", #图幅号
-#                 "time": "2019-04-09 18-58-00" #时间
-#             },
-#         }
-#     }, ....
-# }
+    # {
+    #     "2019-04-09 19-00-00": { #时间线上的时间戳
+    #         "time": "none", #融合后的名字
+    #         "file_path": "none", #融合后的路径
+    #         "subimgs": { #子图
+    #             "2019-04-09 18-58-00": { #时间
+    #                 "extent": [ #范围WGS84
+    #                     23.001399080910634,
+    #                     114.90128470887859,
+    #                     27.133925327023302,
+    #                     119.46273202573005
+    #                 ],
+    #                 "file_path": "D:\\mycode\\CrawlerRadarPrecipitationMap\\tmp\\2019-04-09 20-39-47\\1registration\\1,1\\1,1 2019-04-09 18-58-00.tif",
+    #                 "frame_num": "1,1", #图幅号
+    #                 "time": "2019-04-09 18-58-00" #时间
+    #             },
+    #         }
+    #     }, ....
+    # }
+
+# ========================================================
+#           主逻辑
 def start_work(_params):
     global params
     params = _params
@@ -126,9 +130,10 @@ def start_work(_params):
 
 def stop_work():
     sched.shutdown()
+    log.getlogger().info("【手动关闭】程序已关闭")
 
 # =================================================
-# 定时任务
+#           定时任务
 @sched.scheduled_job('interval', hours=1) #1h爬一次
 def loop():
     global params
@@ -181,7 +186,7 @@ def loop():
     return
 
 # ==================================================================
-# 下载数据
+#               下载数据
 def download():
     global params
     global original_data
@@ -323,7 +328,7 @@ def do_rgs(data_time_value, rgs_file_path):
 
 
 # ==================================================================
-# 融合数据
+#           融合数据
 def mosaic():
     global params
     global registration_data
@@ -353,6 +358,9 @@ def mosaic():
             log.getlogger().info("【融合】出错。")
 
     log.save_json("mosaic_data_{}".format(get_current_time() ), mosaic_data)
+
+    mosaic_dir = params["mosaic_dir"] #融合文件夹
+    save_hdr(mosaic_dir, "mosaic_info", mosaic_data)
     pass
 
 def do_mosaic(timeline_time):
@@ -441,7 +449,7 @@ def do_mosaic(timeline_time):
 
 
 # ===================================================================
-# | Tools
+#           Tools
 def save_hdr(dir, fn, obj):
     import os
     fp = os.path.join(dir, fn + '.json')

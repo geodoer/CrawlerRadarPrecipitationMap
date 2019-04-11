@@ -26,16 +26,17 @@ from json import loads
 
 import log
 
+
+global params
+
+# ========================================================
+#           Flask
 app = Flask(__name__,
     static_url_path='' #将static路径该为/，文件正常引用
 )
-executor = ThreadPoolExecutor(1)
-global params
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/initparam', methods=['post'])
 def initparam():
@@ -45,13 +46,28 @@ def initparam():
     if type(params) is not OrderedDict:
         # 出错
         return redirect_index(params)
-
     frame_len,frames = get_frames(params)
     if frame_len==0:
         return redirect_index("抱歉，任务失败！<br/>框选区域没有雷达降水图。")
     params["frames"] = frames
-
     return render_template('show_frame.html', frames=frames)
+def redirect_index(msg):
+    """ 重定向到index，并且显示msg
+    :param msg:
+    :return:
+    """
+    return '''
+        <html>
+        <head>
+            <title>CityWalker</title>
+            <!-- 自动跳转-->
+            <meta http-equiv="Refresh" content="5;url=http://127.0.0.1:5000/"/>
+        </head>
+        <body>
+        %s<br/>5秒后为您自动跳转
+        </body>
+        </html>
+    ''' % msg
 
 @app.route('/getframesinfo', methods=['post'])
 def getframesinfo():
@@ -88,6 +104,7 @@ def dowork():
 
     return render_template('start.html', infos=ret)
 
+executor = ThreadPoolExecutor(1)
 from worker import start_work
 @app.route('/start', methods=['post'])
 def start():
@@ -104,8 +121,10 @@ def stop():
     stop_work()
     return "ok"
 
+# =====================================================
+#           初始化工作
 def processing_params(request):
-    """
+    """ 参数处理
     :param request:
     :return: params dict
     """
@@ -160,61 +179,8 @@ def processing_params(request):
     log.save_json("processing_params", params)
     return params
 
-def redirect_index(msg):
-    """ 重定向到index，并且显示msg
-    :param msg:
-    :return:
-    """
-    return '''
-        <html>
-        <head>
-            <title>CityWalker</title>
-            <!-- 自动跳转-->
-            <meta http-equiv="Refresh" content="5;url=http://127.0.0.1:5000/"/>
-        </head>
-        <body>
-        %s<br/>5秒后为您自动跳转
-        </body>
-        </html>
-    ''' % msg
-
-def init_dir():
-    global params
-    project_dir = params["project_dir"]
-
-    # original文件夹
-    original_dir = os.path.join(project_dir, "0original")
-    if os.path.exists(original_dir) is False:
-        os.mkdir(original_dir)
-    params["original_dir"] = original_dir
-
-    # registration文件夹
-    registration_dir = os.path.join(project_dir, "1registration")
-    if os.path.exists(registration_dir) is False:
-        os.mkdir(registration_dir)
-    params["registration_dir"] = registration_dir
-
-    # mosaic
-    mosaic_dir = os.path.join(project_dir, "2mosaic")
-    if os.path.exists(mosaic_dir) is False:
-        os.mkdir(mosaic_dir)
-    params["mosaic_dir"] = mosaic_dir
-
-    # frame文件夹
-    for frame_num in params["frames_selected"]:
-        # 原始数据
-        frame_dir = os.path.join(original_dir, frame_num)
-        if os.path.exists(frame_dir) is False:
-            os.mkdir(frame_dir)
-        # 配准数据
-        frame_dir = os.path.join(registration_dir, frame_num)
-        if os.path.exists(frame_dir) is False:
-            os.mkdir(frame_dir)
-
-    return True
-
 def save_params_file(params):
-    """ 将参数输出
+    """ 输出参数至文本
     :param params:
     :return:
     """
@@ -251,6 +217,44 @@ def save_params_file(params):
         return "【ERROR】 保存初始参数时，出错"
     else:
         return ret
+
+def init_dir():
+    """ 初始化文件夹
+    :return:
+    """
+    global params
+    project_dir = params["project_dir"]
+
+    # original文件夹
+    original_dir = os.path.join(project_dir, "0original")
+    if os.path.exists(original_dir) is False:
+        os.mkdir(original_dir)
+    params["original_dir"] = original_dir
+
+    # registration文件夹
+    registration_dir = os.path.join(project_dir, "1registration")
+    if os.path.exists(registration_dir) is False:
+        os.mkdir(registration_dir)
+    params["registration_dir"] = registration_dir
+
+    # mosaic
+    mosaic_dir = os.path.join(project_dir, "2mosaic")
+    if os.path.exists(mosaic_dir) is False:
+        os.mkdir(mosaic_dir)
+    params["mosaic_dir"] = mosaic_dir
+
+    # frame文件夹
+    for frame_num in params["frames_selected"]:
+        # 原始数据
+        frame_dir = os.path.join(original_dir, frame_num)
+        if os.path.exists(frame_dir) is False:
+            os.mkdir(frame_dir)
+        # 配准数据
+        frame_dir = os.path.join(registration_dir, frame_num)
+        if os.path.exists(frame_dir) is False:
+            os.mkdir(frame_dir)
+
+    return True
 
 if __name__ == '__main__':
     webbrowser.open("http:\\127.0.0.1:5000")

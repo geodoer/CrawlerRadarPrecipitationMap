@@ -13,7 +13,8 @@ import time
 TIME_FORMAT = "%Y-%m-%d %H-%M-%S"
 RE_TIME_FORMAT = "^(\d{4}-\d{2}-\d{2}) (\d{2}-\d{2})$"
 
-
+# =====================================================================
+#           时间Tool
 # 时间戳：是指格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总秒数
 def time_to_timestamp(t):
     """ 时间转换成时间戳
@@ -55,7 +56,20 @@ def is_timestr(str):
     else:
         return True
 
+def is_timestr(str):
+    """ 检查是否为时间字符串
+    :param str:
+    :return:
+    """
+    import re
+    result = re.match(RE_TIME_FORMAT, str)
+    if result is None:
+        return False
+    else:
+        return True
 
+# ============================================================
+#               经纬度参数
 def parse_latlngstr(latlng_str):
     """ 从latlng字符串提取经纬度
     :param latlng_str:
@@ -69,19 +83,8 @@ def parse_latlngstr(latlng_str):
     lat,lng = latlng.split(',')
     return float(lat),float(lng)
 
-def is_timestr(str):
-    """ 检查是否为时间字符串
-    :param str:
-    :return:
-    """
-    import re
-    result = re.match(RE_TIME_FORMAT, str)
-    if result is None:
-        return False
-    else:
-        return True
-
-
+# ============================================================
+#               辅助函数
 def floatrange(start, stop, step):
     l = []
     while start<stop:

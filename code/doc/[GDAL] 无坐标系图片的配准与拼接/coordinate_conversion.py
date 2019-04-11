@@ -7,6 +7,13 @@ pi = 3.1415926535897932384626  # π
 a = 6378245.0  # 长半轴
 ee = 0.00669342162296594323  # 扁率
 
+
+def gcj02towgs84_extent(extent_gcj02):
+    x1, y1, x2, y2 = extent_gcj02
+    y1, x1 = gcj02towgs84(y1, x1)
+    y2, x2 = gcj02towgs84(y2, x2)
+    return (x1, y1, x2, y2)
+
 def wgs84togcj02(lng, lat):
     """
     WGS84转GCJ02(火星坐标系)
@@ -27,6 +34,7 @@ def wgs84togcj02(lng, lat):
     mglat = lat + dlat
     mglng = lng + dlng
     return [mglng, mglat]
+
 
 def gcj02towgs84(lng, lat):
     """
