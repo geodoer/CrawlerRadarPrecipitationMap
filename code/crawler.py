@@ -110,6 +110,7 @@ def get_frames(params):
                 else:
                     # 图幅出错
                     extent_gcj02 = None
+                    continue
                 frames[frame_num] = {
                     "req_pnt": (x, y),
                     "extent_gcj02": extent_gcj02

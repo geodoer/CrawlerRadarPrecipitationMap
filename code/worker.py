@@ -353,14 +353,12 @@ def mosaic():
         mosaic_item = do_mosaic(timeline_time)
         if type(mosaic_item) is dict:
             mosaic_data[timeline_time] = mosaic_item
+            save_hdr(params["mosaic_dir"], mosaic_item["time"], mosaic_item) #保存头文件
             log.getlogger().info("【融合】{}时间的数据已处理完成。".format(timeline_time))
         else:
             log.getlogger().info("【融合】出错。")
 
     log.save_json("mosaic_data_{}".format(get_current_time() ), mosaic_data)
-
-    mosaic_dir = params["mosaic_dir"] #融合文件夹
-    save_hdr(mosaic_dir, "mosaic_info", mosaic_data)
     pass
 
 def do_mosaic(timeline_time):
@@ -402,9 +400,13 @@ def do_mosaic(timeline_time):
                 prior_time = time
 
     # log.getlogger().info("[融合] - 找到的图片{}".format(subimgs) )
-    if len(subimgs)!=len(frame_selected):
+    if len(subimgs)<len(frame_selected)/2:
         # 出错了，没有找到这么多幅图片
-        log.getlogger().info("[融合] - 所找图片不够，当前只找到{}".format(len(subimgs)) )
+        log.getlogger().info("[融合] - 所找图片不够({}\{})".format(
+            len(subimgs),
+            len(frame_selected)
+        ))
+        log.getlogger().info("[融合条件] 达到选所图幅的一半：{}".format( len(frame_selected)/2 ))
         return None
 
     if len(subimgs)==1: #只有一幅图
@@ -444,6 +446,7 @@ def do_mosaic(timeline_time):
         return {
             "time": last_time,
             "file_path": mosaic_file_path,
+            "subims_len" : len(new_subimgs),
             "subimgs": new_subimgs
         }
 
