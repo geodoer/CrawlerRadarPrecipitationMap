@@ -46,4 +46,4 @@
 
 4. 开始爬取后可关闭页面
 
-![1583373724814](C:\Users\PasserQi\AppData\Roaming\Typora\typora-user-images\1583373724814.png)
+![](https://img-blog.csdnimg.cn/20200305101415340.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3N1bW1lcl9kZXc=,size_16,color_FFFFFF,t_70)
